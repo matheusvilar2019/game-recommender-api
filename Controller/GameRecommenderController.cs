@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Xml;
+using static System.Net.WebRequestMethods;
 
 namespace GameRecommenderAPI.Controller
 {
@@ -24,10 +25,11 @@ namespace GameRecommenderAPI.Controller
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                var response = await httpClient.GetAsync("https://www.freetogame.com/api/games?platform=pc");
+                string apiUrl = $"https://www.freetogame.com/api/games?category={parameters.Category}&platform={parameters.Platform}";
+                var response = await httpClient.GetAsync(apiUrl);
 
                 if (!response.IsSuccessStatusCode)
-                    return StatusCode((int)response.StatusCode, "Erro ao buscar dados da FreeToGame");
+                    return StatusCode((int)response.StatusCode, response.ReasonPhrase);
 
                 var json = await response.Content.ReadAsStringAsync();
                 var games = JsonSerializer.Deserialize<List<GameDto>>(json);
