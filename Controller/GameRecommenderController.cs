@@ -26,14 +26,17 @@ namespace GameRecommenderAPI.Controller
         [HttpGet("v1/recommender")]
         public async Task<IActionResult> Recommender([FromQuery] string category,
                                                      [FromQuery] string? platform,
-                                                     [FromQuery] int? ramMemory,
-                                                     [FromServices] GameRecommenderDataContext context)
+                                                     [FromQuery] int? ramMemory)
         {
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
+                string query = string.Empty;
 
-                string query = $"category={category}";                 
+                if (!category.Contains(".")) 
+                    query = $"category={category}";
+                else
+                    query = $"tag={category}";
                 if (!string.IsNullOrEmpty(platform))
                     query += $"&platform={platform}";
 
