@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using static System.Net.WebRequestMethods;
 using GameRecommenderAPI.Services;
+using GameRecommenderAPI.Models;
+using GameRecommenderAPI.Data;
 
 namespace GameRecommenderAPI.Controller
 {
@@ -30,7 +32,8 @@ namespace GameRecommenderAPI.Controller
         [HttpGet("v1/recommender")]
         public async Task<IActionResult> Recommender([FromQuery] string category,
                                                      [FromQuery] string? platform,
-                                                     [FromQuery] int? ramMemory)
+                                                     [FromQuery] int? ramMemory,
+                                                     [FromServices] GameRecommenderDataContext context)
         {
             try
             {
@@ -53,7 +56,24 @@ namespace GameRecommenderAPI.Controller
                     return NotFound("RCR-102 - Game not found.");
 
                 GameDto recommendedGame = await _gameRecommenderService.CompatibleMemoryGame(games, ramMemory);
-                return Ok(recommendedGame);
+
+                // Saving recommended game 
+                GameRecommended game = new GameRecommended()
+                {
+                    Name = recommendedGame.Title,
+                    Category = recommendedGame.Genre,
+                };
+
+                await context.AddAsync(game);
+                await context.SaveChangesAsync();
+
+                GameResponseDto responseDto = new GameResponseDto()
+                {
+                    Title = recommendedGame.Title,
+                    FreetogameProfileUrl = recommendedGame.FreetogameProfileUrl
+                };
+
+                return Ok(responseDto);
             } 
             catch (Exception ex)
             {
