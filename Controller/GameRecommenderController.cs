@@ -1,15 +1,8 @@
 ﻿using GameRecommenderAPI.Dtos;
-using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Xml;
-using static System.Net.WebRequestMethods;
 using GameRecommenderAPI.Services;
-using GameRecommenderAPI.Models;
 using GameRecommenderAPI.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace GameRecommenderAPI.Controller
 {
@@ -56,31 +49,9 @@ namespace GameRecommenderAPI.Controller
                 if (games == null || !games.Any())
                     return NotFound("RCR-102 - Game not found.");
 
-                GameDto recommendedGame = await _gameRecommenderService.CompatibleMemoryGame(games, ramMemory);
+                GameDto recommendedGame = await _gameRecommenderService.CompatibleMemoryGameAsync(games, ramMemory);
 
-                // Check game in database
-                var gameDb = await context
-                    .Games
-                    .FirstOrDefaultAsync(c => c.Title == recommendedGame.Title);
-
-                if (gameDb == null)
-                {
-                    // Saving recommended game 
-                    GameRecommended game = new GameRecommended()
-                    {
-                        Title = recommendedGame.Title,
-                        Category = recommendedGame.Genre
-                    };
-
-                    await context.AddAsync(game);
-                    await context.SaveChangesAsync();
-                }
-                else
-                {
-                    gameDb.Counter++;
-                    context.Update(gameDb);
-                    await context.SaveChangesAsync();
-                }
+                await _gameRecommenderService.SaveOrUpdateGameRecommendationAsync(recommendedGame);
 
                 GameResponseDto responseDto = new GameResponseDto()
                 {
