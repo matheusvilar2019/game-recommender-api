@@ -1,3 +1,4 @@
+using GameRecommenderAPI.Data;
 using GameRecommenderAPI.Services;
 using GameRecommenderAPI.Services.Requirements;
 
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<GameRecommenderService>();
 builder.Services.AddScoped<IRequirementExtractor, HtmlRequirementExtractor>();
+builder.Services.AddDbContext<GameRecommenderDataContext>();
 
 var app = builder.Build();
 
