@@ -1,3 +1,6 @@
+using GameRecommenderAPI.Services;
+using GameRecommenderAPI.Services.Requirements;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +10,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<GameRecommenderService>();
+builder.Services.AddScoped<IRequirementExtractor, HtmlRequirementExtractor>();
 
 var app = builder.Build();
 
