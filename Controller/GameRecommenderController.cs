@@ -9,6 +9,7 @@ using static System.Net.WebRequestMethods;
 using GameRecommenderAPI.Services;
 using GameRecommenderAPI.Models;
 using GameRecommenderAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameRecommenderAPI.Controller
 {
@@ -57,15 +58,29 @@ namespace GameRecommenderAPI.Controller
 
                 GameDto recommendedGame = await _gameRecommenderService.CompatibleMemoryGame(games, ramMemory);
 
-                // Saving recommended game 
-                GameRecommended game = new GameRecommended()
-                {
-                    Name = recommendedGame.Title,
-                    Category = recommendedGame.Genre,
-                };
+                // Check game in database
+                var gameDb = await context
+                    .Games
+                    .FirstOrDefaultAsync(c => c.Title == recommendedGame.Title);
 
-                await context.AddAsync(game);
-                await context.SaveChangesAsync();
+                if (gameDb == null)
+                {
+                    // Saving recommended game 
+                    GameRecommended game = new GameRecommended()
+                    {
+                        Title = recommendedGame.Title,
+                        Category = recommendedGame.Genre
+                    };
+
+                    await context.AddAsync(game);
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    gameDb.Counter++;
+                    context.Update(gameDb);
+                    await context.SaveChangesAsync();
+                }
 
                 GameResponseDto responseDto = new GameResponseDto()
                 {
@@ -79,8 +94,7 @@ namespace GameRecommenderAPI.Controller
             {
                 _logger.LogError(ex, "RCR-103 - Internal server error");
                 return StatusCode(500, "RCR-103 - Internal server error");
-            }
-            
+            }            
         }
 
         

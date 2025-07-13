@@ -20,9 +20,9 @@ namespace GameRecommenderAPI.Data.Mapping
                 .IsRequired();
 
             // Properties
-            builder.Property(x => x.Name)
+            builder.Property(x => x.Title)
                 .IsRequired()
-                .HasColumnName("Name")
+                .HasColumnName("Title")
                 .HasColumnType("VARCHAR")
                 .HasMaxLength(50);
 
@@ -31,6 +31,12 @@ namespace GameRecommenderAPI.Data.Mapping
                 .HasColumnName("Category")
                 .HasColumnType("VARCHAR")
                 .HasMaxLength(30);
+
+            builder.Property(x => x.Counter)
+                .IsRequired()
+                .HasColumnName("Counter")
+                .HasColumnType("INT")
+                .HasMaxLength(8);
         }
     }
 }

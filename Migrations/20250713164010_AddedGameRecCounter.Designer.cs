@@ -3,6 +3,7 @@ using GameRecommenderAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameRecommenderAPI.Migrations
 {
     [DbContext(typeof(GameRecommenderDataContext))]
-    partial class GameRecommenderDataContextModelSnapshot : ModelSnapshot
+    [Migration("20250713164010_AddedGameRecCounter")]
+    partial class AddedGameRecCounter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
