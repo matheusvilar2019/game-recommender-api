@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using GameRecommenderAPI.Services;
 using GameRecommenderAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameRecommenderAPI.Controller
 {
@@ -24,9 +25,9 @@ namespace GameRecommenderAPI.Controller
         }
 
         [HttpGet("v1/recommender")]
-        public async Task<IActionResult> Recommender([FromQuery] string category,
-                                                     [FromQuery] string? platform,
-                                                     [FromQuery] int? ramMemory)
+        public async Task<IActionResult> GetRecommendedGameAsync([FromQuery] string category,
+                                                                 [FromQuery] string? platform,
+                                                                 [FromQuery] int? ramMemory)
         {
             try
             {
@@ -71,6 +72,24 @@ namespace GameRecommenderAPI.Controller
             }            
         }
 
-        
+        [HttpGet("v1/all-games-recommended")]
+        public async Task<IActionResult> GetAllGamesRecommendedAsync([FromServices] GameRecommenderDataContext context)
+        {
+            try
+            {
+                var games = await context
+                    .Games
+                    .ToListAsync();
+
+                if (games == null) return NoContent();
+
+                return Ok(games);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AGR-101 - Internal server error");
+                return StatusCode(500, "AGR-101 - Internal server error");
+            }
+        }
     }
 }
