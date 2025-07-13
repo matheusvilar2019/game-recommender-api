@@ -1,12 +1,8 @@
 ﻿using GameRecommenderAPI.Dtos;
-using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Xml;
-using static System.Net.WebRequestMethods;
 using GameRecommenderAPI.Services;
+using GameRecommenderAPI.Data;
 
 namespace GameRecommenderAPI.Controller
 {
@@ -30,7 +26,8 @@ namespace GameRecommenderAPI.Controller
         [HttpGet("v1/recommender")]
         public async Task<IActionResult> Recommender([FromQuery] string category,
                                                      [FromQuery] string? platform,
-                                                     [FromQuery] int? ramMemory)
+                                                     [FromQuery] int? ramMemory,
+                                                     [FromServices] GameRecommenderDataContext context)
         {
             try
             {
@@ -52,15 +49,23 @@ namespace GameRecommenderAPI.Controller
                 if (games == null || !games.Any())
                     return NotFound("RCR-102 - Game not found.");
 
-                GameDto recommendedGame = await _gameRecommenderService.CompatibleMemoryGame(games, ramMemory);
-                return Ok(recommendedGame);
+                GameDto recommendedGame = await _gameRecommenderService.CompatibleMemoryGameAsync(games, ramMemory);
+
+                await _gameRecommenderService.SaveOrUpdateGameRecommendationAsync(recommendedGame);
+
+                GameResponseDto responseDto = new GameResponseDto()
+                {
+                    Title = recommendedGame.Title,
+                    FreetogameProfileUrl = recommendedGame.FreetogameProfileUrl
+                };
+
+                return Ok(responseDto);
             } 
             catch (Exception ex)
             {
                 _logger.LogError(ex, "RCR-103 - Internal server error");
                 return StatusCode(500, "RCR-103 - Internal server error");
-            }
-            
+            }            
         }
 
         

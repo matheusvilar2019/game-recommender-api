@@ -1,6 +1,9 @@
-﻿using GameRecommenderAPI.Dtos;
+﻿using GameRecommenderAPI.Data;
+using GameRecommenderAPI.Dtos;
+using GameRecommenderAPI.Models;
 using GameRecommenderAPI.Services.Requirements;
 using HtmlAgilityPack;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -10,10 +13,12 @@ namespace GameRecommenderAPI.Services
     public class GameRecommenderService
     {
         private readonly IRequirementExtractor _requirementExtractor;
+        private readonly GameRecommenderDataContext _context;
         private readonly Random _random;
-        public GameRecommenderService(IRequirementExtractor requirementExtractor) 
+        public GameRecommenderService(GameRecommenderDataContext context, IRequirementExtractor requirementExtractor) 
         {
             _requirementExtractor = requirementExtractor;
+            _context = context;
             _random = new Random();
         }
 
@@ -22,7 +27,7 @@ namespace GameRecommenderAPI.Services
             return _random.Next(min, max);
         }
 
-        public async Task<GameDto> CompatibleMemoryGame(List<GameDto> games, int? maxRam, int maxAttempts = 500)
+        public async Task<GameDto> CompatibleMemoryGameAsync(List<GameDto> games, int? maxRam, int maxAttempts = 500)
         {
             for (int i = 0; i < maxAttempts; i++)
             {
@@ -39,6 +44,30 @@ namespace GameRecommenderAPI.Services
             }
 
             throw new Exception();
+        }
+
+        public async Task SaveOrUpdateGameRecommendationAsync(GameDto recommendedGame)
+        {
+                var gameDb = await _context
+                    .Games
+                    .FirstOrDefaultAsync(c => c.Title == recommendedGame.Title);
+
+                if (gameDb is null)
+                {
+                    GameRecommended game = new GameRecommended()
+                    {
+                        Title = recommendedGame.Title,
+                        Category = recommendedGame.Genre
+                    };
+                    await _context.AddAsync(game);
+                }
+                else
+                {
+                    gameDb.Counter++;
+                    _context.Update(gameDb);
+                }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

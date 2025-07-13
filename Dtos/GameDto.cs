@@ -9,5 +9,8 @@ namespace GameRecommenderAPI.Dtos
 
         [JsonPropertyName("freetogame_profile_url")]
         public string FreetogameProfileUrl { get; set; }
+
+        [JsonPropertyName("genre")]
+        public string Genre { get; set; }
     }
 }
