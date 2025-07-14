@@ -19,6 +19,7 @@ dotnet restore
 ``` bash
 dotnet ef database update
 ```
+> 💡 A API utiliza uma instância local do SQL Server. A string de conexão está definida diretamente no arquivo `Data/GameRecommenderDataContext.cs`. Certifique-se de que o SQL Server esteja rodando localmente com as configurações padrão.
 
 #### 4. Inicie a API:
 ``` bash
@@ -27,9 +28,9 @@ dotnet run
 
 #### 5. Acesse no navegador:
 ``` bash
-https://localhost:5001/swagger
+http://localhost:5008/swagger/index.html
 ```
-> 💡 A API utiliza uma instância local do SQL Server. A string de conexão está definida diretamente no arquivo `Data/GameRecommenderDataContext.cs`. Certifique-se de que o SQL Server esteja rodando localmente com as configurações padrão.
+> 💡 Nota: A API será executada em uma porta dinâmica como `https://localhost:5001` ou `https://localhost:5008`, dependendo do seu sistema. Depois de executar o `dotnet run`, verifique a saída do terminal para confirmar a porta correta.
 
 ## Endpoint:
 ### Game Recommender
@@ -103,12 +104,26 @@ GET `/v1/all-games-recommended`
     },
 ]
 ```
+> O `counter` mostra quantas vezes este jogo foi recomendado.
 
 #### Respostas Possíveis:
 
 - 200: Success
 - 204: No Content
 - 500: AGR-101 - Internal server error
+
+### 🛠 Tecnologias
+
+```markdown
+## Tecnologias utilizadas
+
+- .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core
+- Swagger / Swashbuckle
+- HttpClient
+- SQL Server
+```
 
 
 # GameRecommenderAPI (EN)
@@ -132,6 +147,7 @@ dotnet restore
 ``` bash
 dotnet ef database update
 ```
+> 💡 The API uses a local SQL Server instance. The connection string is currently hardcoded in `Data/GameRecommenderDataContext.cs`. Make sure your SQL Server is running locally with default settings.
 
 #### 4. Start the API:
 ``` bash
@@ -140,9 +156,9 @@ dotnet run
 
 #### 5. Open your browser and access:
 ``` bash
-https://localhost:5001/swagger
+http://localhost:5008/swagger/index.html
 ```
-> 💡 The API uses a local SQL Server instance. The connection string is currently hardcoded in `Data/GameRecommenderDataContext.cs`. Make sure your SQL Server is running locally with default settings.
+> 💡 Note: The API will run on a dynamic port like `https://localhost:5001` or `https://localhost:5008`, depending on your system. After running `dotnet run`, check the terminal output to confirm the correct port.
 
 ## Endpoint:
 ### Game Recommender
@@ -216,9 +232,23 @@ GET `/v1/all-games-recommended`
     },
 ]
 ```
+> The `counter` shows how many times this game has been recommended.
 
 #### Responses
 
 - 200: Success
 - 204: No Content
 - 500: AGR-101 - Internal server error
+
+### 🛠 Technologies
+
+```markdown
+## Technologies used
+
+- .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core
+- Swagger / Swashbuckle
+- HttpClient
+- SQL Server
+```
